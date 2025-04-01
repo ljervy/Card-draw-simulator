@@ -93,10 +93,10 @@ class XiaoziGUI:
         self.result_label.pack_forget()
 
         # 指定目标图片大小
-        target_width = 50
-        target_height = 50
+        target_width = 80
+        target_height = 45
 
-        image_path = os.path.join("images", "background.png")
+        image_path = os.path.join("images", f"{result}.jpg")
         
         # 使用 Pillow 打开并调整图片大小
         original_image = Image.open(image_path)
@@ -131,10 +131,10 @@ class XiaoziGUI:
             frame.pack(side=tk.LEFT, padx=5)
 
             # 指定目标图片大小
-            target_width = 50
-            target_height = 50
+            target_width = 80
+            target_height = 45
 
-            image_path = os.path.join("images", "background.png")
+            image_path = os.path.join("images", f"{result}.jpg")
             
             # 使用 Pillow 打开并调整图片大小
             original_image = Image.open(image_path)
