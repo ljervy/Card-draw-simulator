@@ -4,6 +4,7 @@ from xiaozi_game import XiaoziGame
 from tkinter import PhotoImage
 import os
 import sys
+import time
 
 class XiaoziGUI:
     def __init__(self, root):
@@ -12,6 +13,7 @@ class XiaoziGUI:
         self.root.title("小紫爱抽卡")
         self.root.geometry("800x800")
         self.root.resizable(False, False)
+        self.is_animating = False
 
         # Determine the path to the background image
         if getattr(sys, 'frozen', False):
@@ -84,6 +86,11 @@ class XiaoziGUI:
         self.main_frame.config(width=self.result_label.winfo_width())  # 设置宽度为内部组件的宽度
 
     def draw_item(self):
+        # 如果正在动画，直接返回
+        if self.is_animating:
+            return
+        
+        self.is_animating = True
         result = self.game.draw()
         self.result_frame.destroy()
         self.result_frame = tk.Frame(self.main_frame, bg='#ffffff')
@@ -114,44 +121,70 @@ class XiaoziGUI:
         text_label.pack()
 
         self.update_stats()
+        self.is_animating = False
 
     def ten_draws(self):
+        # 如果正在动画，直接返回
+        if self.is_animating:
+            return
+        
+        self.is_animating = True
         results = self.game.ten_draws()
         self.result_frame.destroy()
         self.result_frame = tk.Frame(self.main_frame, bg='#ffffff')
-        self.result_frame.pack(pady=20, before=self.draw_button)  # Place result_frame above buttons
-
-        row_frame = None
+        self.result_frame.pack(pady=20, before=self.draw_button)
+        
+        # 预先创建所有行框架
+        row_frames = []
+        for i in range(0, len(results), 5):
+            row_frame = tk.Frame(self.result_frame, bg='#ffffff')
+            row_frame.pack()
+            row_frames.append(row_frame)
+        
+        # 存储所有图像和标签（初始隐藏）
+        self.result_widgets = []
         for index, result in enumerate(results):
-            if index % 5 == 0:
-                row_frame = tk.Frame(self.result_frame, bg='#ffffff')
-                row_frame.pack()
-
+            row_index = index // 5
+            row_frame = row_frames[row_index]
+            
             frame = tk.Frame(row_frame, bg='#ffffff')
             frame.pack(side=tk.LEFT, padx=5)
-
-            # 指定目标图片大小
-            target_width = 80
-            target_height = 45
-
+            
+            # 加载图片
             image_path = os.path.join("images", f"{result}.jpg")
-            
-            # 使用 Pillow 打开并调整图片大小
             original_image = Image.open(image_path)
-            resized_image = original_image.resize((target_width, target_height), Image.LANCZOS)  # LANCZOS 高质量缩放
-            
-            # 转换为 Tkinter 可用的 PhotoImage
+            resized_image = original_image.resize((80, 45), Image.LANCZOS)
             image = ImageTk.PhotoImage(resized_image)
             
+            # 创建图片和文字标签，但初始隐藏
             image_label = tk.Label(frame, image=image, bg='#ffffff')
-            image_label.image = image  # 保持引用，防止被垃圾回收
-            image_label.pack()
-
+            image_label.image = image  # 防止垃圾回收
+            image_label.pack_forget()  # 初始隐藏
+            
             color = self.get_color(result)
             text_label = tk.Label(frame, text=result, font=("Helvetica", 10), bg='#ffffff', fg=color)
-            text_label.pack()
+            text_label.pack_forget()  # 初始隐藏
+            
+            self.result_widgets.append((frame, image_label, text_label))
+        
+        # 开始逐个显示
+        self.current_display_index = 0
+        self.animate_results()
 
-        self.update_stats()
+    def animate_results(self):
+        if self.current_display_index < len(self.result_widgets):
+            frame, image_label, text_label = self.result_widgets[self.current_display_index]
+            
+            # 显示当前项目
+            image_label.pack()
+            text_label.pack()
+            
+            self.current_display_index += 1
+            # 300ms 后显示下一个
+            self.root.after(300, self.animate_results)
+        else:
+            self.update_stats()  # 动画完成后更新统计
+            self.is_animating = False
 
     def get_color(self, result):
         rarity_colors = {
