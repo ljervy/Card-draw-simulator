@@ -5,6 +5,7 @@ PyInstaller.__main__.run([
     '--onefile',
     '--windowed',
     '--name=小紫爱抽卡',
-    '--add-data=background.png;.',
+    '--add-data=images/background.png;images',
+    '--add-data=images/*.jpg;images',
     '--i=xiaozi.ico'
 ])

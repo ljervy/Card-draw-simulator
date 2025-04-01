@@ -20,11 +20,11 @@ class XiaoziGUI:
             # If the application is run as a bundle, the PyInstaller bootloader
             # extends the sys module by a flag frozen=True and sets the app 
             # path into variable _MEIPASS'.
-            application_path = sys._MEIPASS
+            self.application_path = sys._MEIPASS
         else:
-            application_path = os.path.dirname(__file__)
+            self.application_path = os.path.dirname(__file__)
 
-        background_image_path = os.path.join(application_path, "images", "background.png")
+        background_image_path = os.path.join(self.application_path, "images", "background.png")
 
         self.background_image = PhotoImage(file=background_image_path)
         self.background_label = tk.Label(root, image=self.background_image)
@@ -114,7 +114,7 @@ class XiaoziGUI:
         target_width = 80
         target_height = 45
 
-        image_path = os.path.join("images", f"{result}.jpg")
+        image_path = os.path.join(self.application_path, "images", f"{result}.jpg")
         
         # 使用 Pillow 打开并调整图片大小
         original_image = Image.open(image_path)
@@ -165,7 +165,7 @@ class XiaoziGUI:
             frame.pack(side=tk.LEFT, padx=5)
             
             # 加载图片
-            image_path = os.path.join("images", f"{result}.jpg")
+            image_path = os.path.join(self.application_path, "images", f"{result}.jpg")
             original_image = Image.open(image_path)
             resized_image = original_image.resize((80, 45), Image.LANCZOS)
             image = ImageTk.PhotoImage(resized_image)
