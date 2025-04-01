@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "run build script",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/package_script.py"],
+      "problemMatcher": [],
+			"presentation": {
+				"revealProblems": "onProblem",
+				"clear": true
+			},
+      "options": {
+				"cwd": "${workspaceFolder}"
+			}
+    },
+    {
+			"label": "uninstall",
+			"type": "shell",
+			"command": "node",
+			"args": ["${workspaceFolder}/uninstall.js"],
+			"problemMatcher": [],
+			"presentation": {
+				"revealProblems": "onProblem",
+				"clear": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		}
+  ]
+}
