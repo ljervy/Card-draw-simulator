@@ -65,7 +65,18 @@ class XiaoziGUI:
         self.view_items_button = tk.Button(self.main_frame, text="图鉴", command=self.view_items, **button_style)
         self.view_items_button.pack(pady=10)
 
-        self.stats_label = tk.Label(self.main_frame, text="", font=("Helvetica", 12), bg='#ffffff')
+        # 添加在按钮区域下方
+        self.skip_animation_var = tk.BooleanVar()
+        self.skip_animation_check = tk.Checkbutton(
+            self.main_frame, 
+            text="跳过动画", 
+            variable=self.skip_animation_var,
+            font=("Helvetica", 12),
+            bg='#ffffff'
+        )
+        self.skip_animation_check.pack(pady=5)
+
+        self.stats_label = tk.Label(self.main_frame, text="", font=("Helvetica", 12), bg='#ffffff', width=30, height=4)
         self.stats_label.pack(pady=20)
 
         self.rarity_frame = tk.Frame(root, bg='#ffffff', bd=5)
@@ -133,7 +144,10 @@ class XiaoziGUI:
         self.result_frame.destroy()
         self.result_frame = tk.Frame(self.main_frame, bg='#ffffff')
         self.result_frame.pack(pady=20, before=self.draw_button)
-        
+
+        # Hide the result_label
+        self.result_label.pack_forget()
+
         # 预先创建所有行框架
         row_frames = []
         for i in range(0, len(results), 5):
@@ -165,11 +179,23 @@ class XiaoziGUI:
             text_label = tk.Label(frame, text=result, font=("Helvetica", 10), bg='#ffffff', fg=color)
             text_label.pack_forget()  # 初始隐藏
             
+            # 根据是否跳过动画决定是否立即显示
+            if self.skip_animation_var.get():
+                image_label.pack()
+                text_label.pack()
+            else:
+                image_label.pack_forget()
+                text_label.pack_forget()
+            
             self.result_widgets.append((frame, image_label, text_label))
         
-        # 开始逐个显示
-        self.current_display_index = 0
-        self.animate_results()
+        # 根据是否跳过动画决定是否执行动画
+        if self.skip_animation_var.get():
+            self.update_stats()
+            self.is_animating = False
+        else:
+            self.current_display_index = 0
+            self.animate_results()
 
     def animate_results(self):
         if self.current_display_index < len(self.result_widgets):
